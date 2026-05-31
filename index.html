@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Book Quote Finder</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: #f4f3ef;
+      color: #1a1a18;
+      min-height: 100vh;
+      padding: 2rem 1rem;
+    }
+
+    .container { max-width: 700px; margin: 0 auto; }
+
+    h1 { font-size: 24px; font-weight: 600; margin-bottom: 4px; }
+    .tagline { font-size: 14px; color: #5f5e5a; margin-bottom: 1.5rem; }
+
+    .card {
+      background: #fff;
+      border: 1px solid #e0deda;
+      border-radius: 12px;
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+    }
+
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #5f5e5a;
+      margin-bottom: 8px;
+    }
+
+    input[type="password"],
+    input[type="text"],
+    textarea {
+      width: 100%;
+      padding: 10px 12px;
+      font-size: 14px;
+      border: 1px solid #d4d2cc;
+      border-radius: 8px;
+      background: #f9f8f5;
+      color: #1a1a18;
+      font-family: inherit;
+    }
+
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: #378add;
+      box-shadow: 0 0 0 3px rgba(55,138,221,0.15);
+    }
+
+    .hint { font-size: 12px; color: #888780; margin-top: 6px; }
+    .hint a { color: #378add; text-decoration: none; }
+
+    .upload-zone {
+      border: 2px dashed #d4d2cc;
+      border-radius: 12px;
+      padding: 2rem;
+      text-align: center;
+      cursor: pointer;
+      background: #fff;
+      margin-bottom: 1rem;
+      transition: all 0.2s;
+    }
+    .upload-zone:hover { border-color: #378add; background: #f0f7ff; }
+    .upload-zone.over { border-color: #378add; background: #e6f1fb; }
+    .upload-zone .icon { font-size: 36px; margin-bottom: 8px; }
+    .upload-zone p { font-size: 15px; font-weight: 500; margin-bottom: 4px; }
+    .upload-zone small { font-size: 13px; color: #888780; }
+
+    .file-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: #e6f1fb;
+      color: #0c447c;
+      font-size: 13px;
+      padding: 6px 12px;
+      border-radius: 20px;
+      margin-bottom: 1rem;
+    }
+    .file-pill button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #0c447c;
+      font-size: 16px;
+      line-height: 1;
+      padding: 0;
+    }
+
+    .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+    .chip {
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      border: 1px solid #d4d2cc;
+      background: #f4f3ef;
+      color: #5f5e5a;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .chip:hover { background: #e8e6e0; color: #1a1a18; }
+
+    .btn {
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      border: none;
+      background: #378add;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.15s;
+      margin-bottom: 1rem;
+    }
+    .btn:hover { opacity: 0.88; }
+    .btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .status {
+      text-align: center;
+      padding: 2rem;
+      color: #888780;
+      font-size: 14px;
+      background: #fff;
+      border: 1px solid #e0deda;
+      border-radius: 12px;
+      margin-bottom: 1rem;
+    }
+
+    .error {
+      background: #fff5f5;
+      border: 1px solid #fca5a5;
+      color: #991b1b;
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 14px;
+      margin-bottom: 1rem;
+    }
+
+    .results-header {
+      font-size: 13px;
+      color: #5f5e5a;
+      margin-bottom: 10px;
+    }
+
+    .quote-card {
+      background: #fff;
+      border: 1px solid #e0deda;
+      border-left: 4px solid #378add;
+      border-radius: 12px;
+      padding: 1.25rem;
+      margin-bottom: 12px;
+    }
+
+    .quote-text {
+      font-family: Georgia, serif;
+      font-size: 15px;
+      line-height: 1.75;
+      color: #1a1a18;
+      margin-bottom: 12px;
+    }
+
+    .quote-footer {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .badge {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 6px;
+    }
+    .badge-high { background: #eaf3de; color: #3b6d11; }
+    .badge-med  { background: #faeeda; color: #854f0b; }
+
+    .reason { font-size: 13px; color: #5f5e5a; flex: 1; }
+
+    .copy-btn {
+      font-size: 12px;
+      padding: 5px 10px;
+      border-radius: 6px;
+      border: 1px solid #d4d2cc;
+      background: #f4f3ef;
+      color: #5f5e5a;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .copy-btn:hover { background: #e8e6e0; color: #1a1a18; }
+
+    .context {
+      font-size: 12px;
+      color: #888780;
+      border-top: 1px solid #f0ede8;
+      margin-top: 10px;
+      padding-top: 8px;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spin { display: inline-block; animation: spin 1s linear infinite; }
+
+    footer {
+      text-align: center;
+      font-size: 12px;
+      color: #b4b2a9;
+      margin-top: 2rem;
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+
+  <h1>📚 Book Quote Finder</h1>
+  <p class="tagline">Upload any book PDF and find quotes for your essay.</p>
+
+  <!-- API Key -->
+  <div class="card">
+    <label for="api-key">Anthropic API Key</label>
+    <input type="password" id="api-key" placeholder="sk-ant-..." />
+    <p class="hint">Get a free key at <a href="https://console.anthropic.com/keys" target="_blank">console.anthropic.com/keys</a> — stays in your browser only.</p>
+  </div>
+
+  <!-- Upload -->
+  <div class="upload-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
+    <div class="icon">📄</div>
+    <p>Click to upload or drag & drop your PDF</p>
+    <small>Text-based PDFs work best (not scanned images)</small>
+  </div>
+  <input type="file" id="file-input" accept="application/pdf" style="display:none" />
+
+  <div id="file-pill-wrap" style="display:none">
+    <div class="file-pill">
+      📄 <span id="file-name"></span>
+      <button onclick="clearFile()" title="Remove">✕</button>
+    </div>
+  </div>
+
+  <!-- Search -->
+  <div id="search-section" style="display:none">
+    <div class="card">
+      <label for="query">Essay topic or theme</label>
+      <input type="text" id="query" placeholder="e.g. power and corruption, identity, love and loss…" />
+      <div class="chips">
+        <span class="chip" onclick="chip('power and corruption')">power & corruption</span>
+        <span class="chip" onclick="chip('identity and belonging')">identity & belonging</span>
+        <span class="chip" onclick="chip('love and sacrifice')">love & sacrifice</span>
+        <span class="chip" onclick="chip('justice and morality')">justice & morality</span>
+        <span class="chip" onclick="chip('class and inequality')">class & inequality</span>
+        <span class="chip" onclick="chip('fate and free will')">fate & free will</span>
+        <span class="chip" onclick="chip('appearance vs reality')">appearance vs reality</span>
+        <span class="chip" onclick="chip('ambition and downfall')">ambition & downfall</span>
+        <span class="chip" onclick="chip('coming of age')">coming of age</span>
+        <span class="chip" onclick="chip('race and discrimination')">race & discrimination</span>
+      </div>
+    </div>
+    <button class="btn" id="search-btn" onclick="findQuotes()">Find quotes</button>
+  </div>
+
+  <div id="output"></div>
+
+  <footer>Runs entirely in your browser · Powered by Anthropic API</footer>
+</div>
+
+<script>
+  let pdfBase64 = null;
+
+  const dropZone = document.getElementById('drop-zone');
+  const fileInput = document.getElementById('file-input');
+
+  dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('over'); });
+  dropZone.addEventListener('dragleave', () => dropZone.classList.remove('over'));
+  dropZone.addEventListener('drop', e => {
+    e.preventDefault();
+    dropZone.classList.remove('over');
+    const f = e.dataTransfer.files[0];
+    if (f?.type === 'application/pdf') loadFile(f);
+    else alert('Please upload a PDF file.');
+  });
+  fileInput.addEventListener('change', () => { if (fileInput.files[0]) loadFile(fileInput.files[0]); });
+
+  function loadFile(file) {
+    const reader = new FileReader();
+    reader.onload = () => {
+      pdfBase64 = reader.result.split(',')[1];
+      document.getElementById('file-name').textContent = file.name;
+      document.getElementById('file-pill-wrap').style.display = 'block';
+      document.getElementById('search-section').style.display = 'block';
+      dropZone.style.display = 'none';
+      document.getElementById('output').innerHTML = '';
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function clearFile() {
+    pdfBase64 = null;
+    fileInput.value = '';
+    document.getElementById('file-pill-wrap').style.display = 'none';
+    document.getElementById('search-section').style.display = 'none';
+    dropZone.style.display = 'block';
+    document.getElementById('output').innerHTML = '';
+  }
+
+  function chip(text) {
+    document.getElementById('query').value = text;
+    document.getElementById('query').focus();
+  }
+
+  async function findQuotes() {
+    const apiKey = document.getElementById('api-key').value.trim();
+    const query  = document.getElementById('query').value.trim();
+    const out    = document.getElementById('output');
+    const btn    = document.getElementById('search-btn');
+
+    if (!apiKey) { alert('Paste your Anthropic API key first.'); return; }
+    if (!pdfBase64) { alert('Upload a PDF first.'); return; }
+    if (!query) { alert('Enter an essay topic first.'); return; }
+
+    btn.disabled = true;
+    btn.textContent = 'Searching…';
+    out.innerHTML = `<div class="status"><span class="spin">⏳</span> Reading the book and finding quotes — this may take 20–30 seconds…</div>`;
+
+    try {
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true'
+        },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 2000,
+          system: `You are a literary scholar helping students find quotes for essays.
+Given a book PDF and an essay topic, find 6 of the most powerful and quotable passages that support the theme.
+Respond ONLY with a valid JSON array, no markdown, no explanation:
+[{"quote":"exact text","relevance":"high","reason":"one sentence why this fits the topic","context":"where/who in the book"}]
+relevance must be "high" or "medium". Prefer vivid, specific, literary quotes over generic plot moments.`,
+          messages: [{
+            role: 'user',
+            content: [
+              { type: 'document', source: { type: 'base64', media_type: 'application/pdf', data: pdfBase64 } },
+              { type: 'text', text: `Essay topic: "${query}"\n\nFind the best quotes for my essay.` }
+            ]
+          }]
+        })
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error?.message || `HTTP ${res.status}`);
+      }
+
+      const data = await res.json();
+      const raw  = data.content.map(b => b.text || '').join('');
+      const json = raw.replace(/```json\s*/g, '').replace(/```/g, '').trim();
+      const quotes = JSON.parse(json);
+      render(quotes, query);
+
+    } catch (e) {
+      out.innerHTML = `<div class="error"><strong>Error:</strong> ${e.message}<br><small>Double-check your API key. Make sure your PDF has selectable text (not a scanned image).</small></div>`;
+    }
+
+    btn.disabled = false;
+    btn.textContent = 'Find quotes';
+  }
+
+  function render(quotes, query) {
+    const out = document.getElementById('output');
+    if (!Array.isArray(quotes) || !quotes.length) {
+      out.innerHTML = `<div class="status">No strong matches found for "${esc(query)}". Try rephrasing your topic.</div>`;
+      return;
+    }
+    out.innerHTML = `<p class="results-header">${quotes.length} quotes found for "<strong>${esc(query)}</strong>"</p>` +
+      quotes.map((q, i) => `
+        <div class="quote-card">
+          <p class="quote-text">"${esc(q.quote)}"</p>
+          <div class="quote-footer">
+            <span class="badge ${q.relevance === 'high' ? 'badge-high' : 'badge-med'}">${q.relevance === 'high' ? '★ High' : '◆ Medium'}</span>
+            <span class="reason">${esc(q.reason)}</span>
+            <button class="copy-btn" onclick="copyQ(this, '${esc(q.quote).replace(/'/g,"\\'")}')">Copy</button>
+          </div>
+          ${q.context ? `<p class="context">📍 ${esc(q.context)}</p>` : ''}
+        </div>
+      `).join('');
+  }
+
+  function copyQ(btn, text) {
+    navigator.clipboard.writeText(`"${text}"`).then(() => {
+      const orig = btn.textContent;
+      btn.textContent = 'Copied!';
+      setTimeout(() => btn.textContent = orig, 1800);
+    });
+  }
+
+  function esc(s) {
+    return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+</script>
+</body>
+</html>
